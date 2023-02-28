@@ -20,7 +20,7 @@ import torch.nn.functional as F
 import datasets
 import torchvision
 import configs
-import pdb
+from tqdm import tqdm
 
 
 class BaseExp(experiment.Experiment):
@@ -85,12 +85,17 @@ class BaseExp(experiment.Experiment):
     
     def test(self):
         acc = tp_metrics.Accuracy()
-        for batch in self.testloader:
+        tqdm_loader = tqdm(self.testloader)
+        i = 0
+        for batch in tqdm_loader:
+            i += 1
             samples = batch['samples']
             labels = batch['labels']
             places = batch['places']
             logits = self.model(samples)
             acc.update(logits, labels)
+            tqdm_loader.set_description(f'Accuracy: {acc.get()}')
+
         
         print(f'Accuracy: {acc.get()}')
     
